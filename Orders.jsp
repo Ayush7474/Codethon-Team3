@@ -90,8 +90,8 @@
     <%
         // Database connection parameters
         String url = "jdbc:oracle:thin:@localhost:1521:xe"; // Update with your database URL
-        String user = "your_username"; // Update with your database username
-        String password = "your_password"; // Update with your database password
+        String user = "system"; // Update with your database username
+        String password = "123"; // Update with your database password
 
         Connection conn = null;
         PreparedStatement stmt = null;
@@ -102,37 +102,48 @@
             Class.forName("oracle.jdbc.driver.OracleDriver");
             // Establish connection
             conn = DriverManager.getConnection(url, user, password);
+            out.println("Database connected successfully!<br/>");  // Debugging line
+
             // Fetch existing orders
-            String sql = "SELECT order_id, supplier_id, order_amount, payment_status, payment_id FROM orders";
+            String sql = "SELECT order_id, supplier_id, payment_amount, order_status, payment_status, payment_id FROM orders";
             stmt = conn.prepareStatement(sql);
             rs = stmt.executeQuery();
 
+            // Debugging line to print the number of records
+            if (!rs.isBeforeFirst()) {
+                out.println("No records found in orders table.<br/>");
+            }
+
             while (rs.next()) {
-                int orderId = rs.getInt("order_id");
-                int supplierId = rs.getInt("supplier_id");
-                double orderAmount = rs.getDouble("order_amount");
+                String orderId = rs.getString("order_id");
+                String supplierId = rs.getString("supplier_id");
+                double orderAmount = rs.getDouble("payment_amount");
                 String paymentStatus = rs.getString("payment_status");
-                int paymentId = rs.getInt("payment_id");
+                String paymentId = rs.getString("payment_id");
+
+                // Debugging line to check fetched data
+                out.println("Fetched Order: " + orderId + ", Supplier: " + supplierId + "<br/>");
     %>
                 <tr>
+                    <!-- Viewing mode -->
                     <td class="view-<%= orderId %>"><%= orderId %></td>
                     <td class="view-<%= orderId %>"><%= supplierId %></td>
                     <td class="view-<%= orderId %>"><%= orderAmount %></td>
                     <td class="view-<%= orderId %>"><%= paymentStatus %></td>
                     <td class="view-<%= orderId %>"><%= paymentId %></td>
                     <td>
-                        <button onclick="toggleEdit(<%= orderId %>)">Edit</button>
+                        <button onclick="toggleEdit('<%= orderId %>')">Edit</button>
                     </td>
 
-                    <!-- Editable fields -->
+                    <!-- Editable fields mode -->
                     <td class="edit-<%= orderId %> edit-mode">
-                        <form action="UpdateOrderServlet" method="post">
+                        <form action="UpdateOrdersServlet" method="POST">
                             <input type="hidden" name="order_id" value="<%= orderId %>">
                             <input type="number" name="order_amount_<%= orderId %>" value="<%= orderAmount %>" required>
                             <select name="payment_status_<%= orderId %>" required>
-                                <option value="Paid" <%= paymentStatus.equals("Paid") ? "selected" : "" %>>Paid</option>
-                                <option value="Pending" <%= paymentStatus.equals("Pending") ? "selected" : "" %>>Pending</option>
-                                <option value="Failed" <%= paymentStatus.equals("Failed") ? "selected" : "" %>>Failed</option>
+                                <option value="done" <%= paymentStatus.equals("done") ? "selected" : "" %>>Done</option>
+                                <option value="pending" <%= paymentStatus.equals("pending") ? "selected" : "" %>>Pending</option>
+                                <option value="failed" <%= paymentStatus.equals("failed") ? "selected" : "" %>>Failed</option>
                             </select>
                             <button type="submit">Update</button>
                         </form>
@@ -142,6 +153,7 @@
             }
         } catch (Exception e) {
             e.printStackTrace();
+            out.println("Error: " + e.getMessage() + "<br/>");  // Display the error
         } finally {
             // Clean up
             try { if (rs != null) rs.close(); } catch (SQLException e) {}
@@ -153,4 +165,3 @@
 
 </body>
 </html>
-
