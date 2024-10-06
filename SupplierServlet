@@ -1,61 +1,106 @@
-// SupplierServlet.java
-package com.supplier;
-
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
+@WebServlet("/SupplierServlet")
 public class SupplierServlet extends HttpServlet {
+    private static final String DB_URL = "jdbc:oracle:thin:@localhost:1521:xe"; // Update with your DB details
+    private static final String USER = "system"; // Update with your DB username
+    private static final String PASS = "123"; // Update with your DB password
 
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        Connection connection = null;
-        PreparedStatement statement = null;
-        ResultSet resultSet = null;
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        // Fetch existing suppliers to show in the JSP
+        List<String[]> supplierList = getAllSuppliers();
+        request.setAttribute("supplierList", supplierList);
+        
+        // Forward to the JSP page
+        request.getRequestDispatcher("supplier.jsp").forward(request, response);
+    }
 
-        try {
-            connection = DBConnection.getConnection();
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String action = request.getParameter("action");
 
-            String query = "SELECT supplierId, supplierName, contactNumber, email FROM Supplier";
-            statement = connection.prepareStatement(query);
-            resultSet = statement.executeQuery();
-
-            List<Supplier> supplierList = new ArrayList<>();
-            while (resultSet.next()) {
-                Supplier supplier = new Supplier();
-                supplier.setSupplierId(resultSet.getInt("supplierId"));
-                supplier.setSupplierName(resultSet.getString("supplierName"));
-                supplier.setContactNumber(resultSet.getString("contactNumber"));
-                supplier.setEmail(resultSet.getString("email"));
-
-                supplierList.add(supplier);
-            }
-
-            // Set the supplier list as an attribute
-            request.setAttribute("supplierList", supplierList);
-
-            // Forward to supplier.jsp
-            request.getRequestDispatcher("supplier.jsp").forward(request, response);
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (resultSet != null) resultSet.close();
-                if (statement != null) statement.close();
-                if (connection != null) connection.close();
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+        if ("add".equals(action)) {
+            addSupplier(request);
+        } else if ("update".equals(action)) {
+            updateSupplier(request);
+        } else if ("delete".equals(action)) {
+            deleteSupplier(request);
         }
+
+        // Fetch existing suppliers after the action
+        List<String[]> supplierList = getAllSuppliers();
+        request.setAttribute("supplierList", supplierList);
+        
+        // Forward to the JSP page
+        request.getRequestDispatcher("supplier.jsp").forward(request, response);
+    }
+
+    private void addSupplier(HttpServletRequest request) {
+        String supplierId = request.getParameter("supplier_id");
+        String supplierName = request.getParameter("supplier_name");
+        String supplierPassword = request.getParameter("supplier_password");
+        String supplierEmail = request.getParameter("supplier_email");
+        String supplierPhone = request.getParameter("supplier_phone");
+
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO suppliers (supplier_id, supplier_name, supplier_password, supplier_email, supplier_phone) VALUES (?, ?, ?, ?, ?)")) {
+            pstmt.setString(1, supplierId);
+            pstmt.setString(2, supplierName);
+            pstmt.setString(3, supplierPassword);
+            pstmt.setString(4, supplierEmail);
+            pstmt.setString(5, supplierPhone);
+            pstmt.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateSupplier(HttpServletRequest request) {
+        // Implement update logic if needed
+    }
+
+    private void deleteSupplier(HttpServletRequest request) {
+        String supplierId = request.getParameter("supplier_id");
+
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             PreparedStatement pstmt = conn.prepareStatement("DELETE FROM suppliers WHERE supplier_id = ?")) {
+            pstmt.setString(1, supplierId);
+            pstmt.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private List<String[]> getAllSuppliers() {
+        List<String[]> suppliers = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(DB_URL, USER, PASS);
+             PreparedStatement pstmt = conn.prepareStatement("SELECT supplier_id, supplier_name, supplier_password, supplier_email, supplier_phone FROM suppliers");
+             ResultSet rs = pstmt.executeQuery()) {
+
+            while (rs.next()) {
+                String[] supplier = new String[5];
+                supplier[0] = rs.getString("supplier_id");
+                supplier[1] = rs.getString("supplier_name");
+                supplier[2] = rs.getString("supplier_password");
+                supplier[3] = rs.getString("supplier_email");
+                supplier[4] = rs.getString("supplier_phone");
+                suppliers.add(supplier);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return suppliers;
     }
 }
