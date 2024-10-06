@@ -1,59 +1,101 @@
-package AdminLogin;
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
+ */
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.*;
-import javax.servlet.*;
-import javax.servlet.http.*;
+import jakarta.servlet.http.HttpSession;
+import java.io.PrintWriter;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
+/**
+ *
+ * @author siddh
+ */
 public class AdminLoginServlet extends HttpServlet {
 
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        try {
+        String adminId = request.getParameter("admin_id");
+        String adminPassword = request.getParameter("admin_password");
+        
+        String url = "jdbc:oracle:thin:@localhost:1521:xe"; // Update with your database URL
+        String user = "system"; // Update with your database username
+        String password = "123"; // Update with your database password
+        
+            Class.forName("oracle.jdbc.OracleDriver");
+            Connection conn = DriverManager.getConnection(url, user, password);
+            String sql = "SELECT * FROM admin WHERE admin_id = ? AND admin_password = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1, adminId);
+            stmt.setString(2, adminPassword);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                HttpSession session = request.getSession();
+                session.setAttribute("adminId", adminId); // Store admin ID in session
+                response.sendRedirect("AdminDashboard.jsp"); // Redirect to dashboard
+            } else {
+                response.sendRedirect("AdminLogin.jsp?error=Invalid credentials"); // Redirect back with error
+            }
+        } catch (Exception e) {
+            out.print(e);
+        }
+    }
+
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    /**
+     * Handles the HTTP <code>GET</code> method.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        processRequest(request, response);
+    }
+
+    /**
+     * Handles the HTTP <code>POST</code> method.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html");
-        PrintWriter out = response.getWriter();
-        
-        // Get admin credentials from the form
-        String adminId = request.getParameter("adminId");
-        String password = request.getParameter("password");
-        
-        //Initialize database connection variables
-        String url = "jdbc:mysql://localhost:3306/yourdatabase";
-        String dbUsername = "root"; // Your DB username
-        String dbPassword = "password"; // Your DB password*/
-        
-        try {
-             //Load the MySQL driver
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            
-            // Establish the connection
-            Connection con = DriverManager.getConnection(url, dbUsername, dbPassword);
-            
-            // Prepare the SQL query
-            String query = "SELECT * FROM admin WHERE admin_id = ? AND password = ?";
-            PreparedStatement pstmt = con.prepareStatement(query);
-            pstmt.setString(1, adminId);
-            pstmt.setString(2, password);
-            
-             //Execute the query
-            ResultSet rs = pstmt.executeQuery();
-            
-             //Check if the credentials are valid
-            if (rs.next()) {
-                response.sendRedirect("AdminDashboard.jsp");
-            } else {
-                out.println("<h2>Invalid Admin ID or Password</h2>");
-            }
-            
-            //Close connections
-            rs.close();
-            pstmt.close();
-            con.close();
-            
-       } catch (Exception e) {
-            e.printStackTrace();
-            out.println("<h2>Error connecting to the database!</h2>");
-       }
+        processRequest(request, response);
     }
+
+    /**
+     * Returns a short description of the servlet.
+     *
+     * @return a String containing servlet description
+     */
+    @Override
+    public String getServletInfo() {
+        return "Short description";
+    }// </editor-fold>
+
 }
