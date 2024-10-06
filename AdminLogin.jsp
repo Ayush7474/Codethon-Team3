@@ -4,38 +4,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Admin Login</title>
     <style>
         body {
-            background-color: #f0f0f0;
-            color: #333;
+            background-color: #f4f4f4;
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        form {
+            background: white;
             padding: 20px;
-            text-align: center;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
         }
-
-        h2 {
-            margin-bottom: 20px;
-        }
-
-        input[type="text"], input[type="password"] {
-            width: 300px;
+        input {
+            margin: 10px 0;
             padding: 10px;
-            margin: 5px 0;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            width: 100%;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
-
         button {
             background-color: #007bff;
             color: white;
+            padding: 10px;
             border: none;
-            padding: 10px 15px;
+            border-radius: 5px;
             cursor: pointer;
-            border-radius: 4px;
-            margin-top: 10px;
+            width: 100%;
         }
-
         button:hover {
             background-color: #0056b3;
         }
@@ -43,20 +45,10 @@
 </head>
 <body>
 
-<%
-    // Get the role parameter from the request
-    String role = request.getParameter("role");
-    if (role == null) {
-        role = "user"; // Default to user login if no role is passed
-    }
-%>
-
-<h2><%= role.equals("admin") ? "Admin Login" : "User Login" %></h2>
-<!-- Login Form -->
-<form action="AdminLoginServlet" method="post">
-    <input type="hidden" name="role" value="<%= role %>">
-    <input type="text" name="username" placeholder="Username" required>
-    <input type="password" name="password" placeholder="Password" required>
+<form action="AdminLoginServlet" method="POST">
+    <h2>Admin Login</h2>
+    <input type="text" name="admin_id" placeholder="Admin ID" required>
+    <input type="password" name="admin_password" placeholder="Password" required>
     <button type="submit">Login</button>
 </form>
 
