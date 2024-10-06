@@ -147,7 +147,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Suppliers Details</h5>
                         <p class="card-text">View and manage supplier information.</p>
-                        <a href="suppliers.jsp" class="btn btn-primary">Go to Suppliers</a>
+                        <a href="supplier.jsp" class="btn btn-primary">Go to Suppliers</a>
                     </div>
                 </div>
             </div>
@@ -158,7 +158,7 @@
                     <div class="card-body">
                         <h5 class="card-title">Orders</h5>
                         <p class="card-text">View and process orders from users.</p>
-                        <a href="orders.jsp" class="btn btn-primary">Go to Orders</a>
+                        <a href="Orders.jsp" class="btn btn-primary">Go to Orders</a>
                     </div>
                 </div>
             </div>
