@@ -4,25 +4,19 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Sign up</title>
+<title>Login</title>
 </head>
 <body>
-<h1>User Sign up</h1>
-	<form action="SignupInfoServlet" method="post">
-		<label for="username">Username:</label>
-		<input type="text" id="username" name="username" required>
-		
-		<label for="password">Password:</label>
-        <input type="password" id="password" name="password" required>
+	<h1>User Login</h1>
+	<form action="LoginServlet" method="post">
+	 <label for="uname">Username</label>
+     <input type="text" placeholder="Enter Username" id="username" name="username" required>
         
-        <label for="email">Email:</label>
-        <input type="text" id="email" name="email" required>
-        
-        <label for="mobile">Mobile:</label>
-        <input type="text" id="mobile" name="mobile" required>
-        
-        <button type="submit" class="btn">Sign Up</button>
-	</form>
-
+     <label for="psw">Password</label>
+     <input type="password" placeholder="Enter Password" id="password" name="password" required>
+     
+      <button class="submit" type="submit">Login</button><br>
+      <span>Don't have an account? <a href="USignup.jsp" class="signup">Sign Up</a></span>
+      </form>
 </body>
 </html>
