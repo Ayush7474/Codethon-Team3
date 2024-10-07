@@ -1,28 +1,28 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Landing Page</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Link to the CSS file -->
+<meta charset="UTF-8">
+<title>Sign up</title>
 </head>
 <body>
-    <h1>--------WELCOME-------</h1>
+<h1>User Sign up</h1>
+	<form action="signupInfoServlet" method="post">
+		<label for="username">Username:</label>
+		<input type="text" id="username" name="username" required>
+		
+		<label for="password">Password:</label>
+        <input type="password" id="password" name="password" required>
+        
+        <label for="email">Email:</label>
+        <input type="text" id="email" name="email" required>
+        
+        <label for="mobile">Mobile:</label>
+        <input type="text" id="mobile" name="mobile" required>
+        
+        <button type="submit" class="btn">Sign Up</button>
+	</form>
 
-    <div class="container">
-        <!-- Admin Box -->
-        <div class="box">
-            <h3>Administrator</h3>
-            <a href="AdminLogin.jsp?role=admin">Login as Admin</a>
-        </div>
-
-        <!-- User Box -->
-        <div class="box">
-            <h3>User</h3>
-            <a href="ULogin.jsp?role=user">Login as User</a>
-        </div>
-    </div>
-</body>
-    
 </body>
 </html>
